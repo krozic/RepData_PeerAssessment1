@@ -5,17 +5,17 @@ output:
     keep_md: true
 ---
 
-```{r, echo = FALSE}
-knitr::opts_chunk$set(warning = FALSE, message = FALSE)
-```
 
-```{r}
+
+
+```r
 unzip("./activity.zip", exdir = ".")
 ```
 
 ### Loading and preprocessing the data
 
-```{r}
+
+```r
 library(ggplot2)
 library(dplyr)
 activity <- read.csv("activity.csv")
@@ -31,7 +31,8 @@ It should be "NA", not '0', and this gives a false mean and median later.
 
 For this reason, `na.rm = T` was used for `mean()` and `median()` rather than `sum()`.
 
-```{r}
+
+```r
 totalsteps <- activity %>% 
             group_by(date) %>% 
             summarise(total = sum(steps))
@@ -42,12 +43,24 @@ ggplot(totalsteps, aes(total)) +
          x = "Total Steps")
 ```
 
-```{r}
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
+
+
+```r
 mean(totalsteps$total, na.rm = T)
 ```
 
-```{r}
+```
+## [1] 10766.19
+```
+
+
+```r
 median(totalsteps$total, na.rm = T)
+```
+
+```
+## [1] 10765
 ```
 
 The mean steps taken per day was found to be 10766.19 while the median steps taken per day was found to be 10765.
@@ -56,7 +69,8 @@ The mean steps taken per day was found to be 10766.19 while the median steps tak
 
 ### What is the average daily activity pattern?
 
-```{r}
+
+```r
 meansteps <- activity %>% 
             group_by(interval) %>% 
             summarise(total = mean(steps, na.rm = T))
@@ -64,8 +78,18 @@ meansteps <- activity %>%
 ggplot(meansteps, aes(interval, total)) + geom_line()
 ```
 
-```{r}
+![](PA1_template_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
+
+
+```r
 meansteps[which.max(meansteps$total), ]
+```
+
+```
+## # A tibble: 1 x 2
+##   interval total
+##      <int> <dbl>
+## 1      835  206.
 ```
 
 The 5-minute interval with the maximum average number of steps was found to be 835.
@@ -74,13 +98,19 @@ The 5-minute interval with the maximum average number of steps was found to be 8
 
 ### Imputing missing values.
 
-```{r}
+
+```r
 sum(is.na(activity$steps))
+```
+
+```
+## [1] 2304
 ```
 
 This dataset contains 2304 'NA's.
 
-```{r}
+
+```r
 activityNoNA <- activity
 for(i in which(is.na(activityNoNA$steps))) {
     intervalVal <- activityNoNA$interval[i]
@@ -91,7 +121,8 @@ for(i in which(is.na(activityNoNA$steps))) {
 
 This loop imputes the missing data with the mean for the corresponding time interval.
 
-```{r}
+
+```r
 totalsteps <- activityNoNA %>% 
             group_by(date) %>% 
             summarise(total = sum(steps))
@@ -102,12 +133,24 @@ ggplot(totalsteps, aes(total)) +
          x = "Total Steps")
 ```
 
-```{r}
+![](PA1_template_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
+
+
+```r
 mean(totalsteps$total)
 ```
 
-```{r}
+```
+## [1] 10766.19
+```
+
+
+```r
 median(totalsteps$total)
+```
+
+```
+## [1] 10766.19
 ```
 
 The mean steps taken per day was found to be 10766.19 while the median steps taken per day was also found to be 10766.19.
@@ -116,7 +159,8 @@ The mean steps taken per day was found to be 10766.19 while the median steps tak
 
 ### Are there differences in activity patterns between weekdays and weekends?
 
-```{r}
+
+```r
 activityNoNA$day <- weekdays(as.Date(activityNoNA$date))
 weekend <- activityNoNA$day %in% c("Saturday", "Sunday")
 activityNoNA$daytype <- "NA"
@@ -135,5 +179,7 @@ ggplot(meansteps, aes(interval, total)) +
          y = "Avg. Number of Steps", 
          title = "Number of Steps Separated by Weekday/Weekend")
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
 
 There appears to be more activity in the <1000 interval region on weekdays, but more activity in the >1000 interval region on weekends. Activity also appears to begin later and end later on weekends.
